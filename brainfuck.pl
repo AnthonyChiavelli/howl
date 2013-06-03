@@ -15,6 +15,11 @@ sub cond_z;
 sub cond_nz;
 sub not_whitespace;
 
+#Pseudo-constants because I'm still in C mode despite this
+#being perl #yolo
+my $TABLE_SIZE = 5000;
+
+
 #Array for command line args
 my %opts=();
 #Parse for flags and args
@@ -40,6 +45,12 @@ my %symbol_table = (
   "]" => "cond_nz"
 );
 
+#Array of values, initialized to zero
+my @table=((0) x $TABLE_SIZE);
+
+#Current pointer
+my $ptr;
+
 #Holds symbols read in
 my $symbol;
 
@@ -63,3 +74,8 @@ sub not_whitespace {
   }
   return 1;
 }
+
+sub output_val {
+  
+}
+
