@@ -87,10 +87,32 @@ sub not_whitespace {
   return 1;
 }
 
+sub input_val {
+    
+}
 sub output_val {print $table[$ptr]}
-sub inc_ptr{$ptr++}
-sub dec_ptr{$ptr--}
-sub inc_val{$table[$ptr]++}
-sub dev_val{$table[$ptr]--}
+sub inc_ptr{
+  $ptr++;
+  if ($ptr > $TABLE_SIZE) {
+    print "\nError: Out of Bounds (pointer > table size limit) at $line:$col\n";
+    die $!;
+  }
+  
+}
+sub dec_ptr{
+  $ptr--;
+  if ($ptr < 0) {
+    print "\nError: Out Of Bounds (pointer < 0) at $line:$col\n";
+    die $!;
+  }
+  
+}
+sub inc_val{
+  $table[$ptr]++;
+}
+
+sub dec_val{
+  $table[$ptr]--;
+}
 
 
