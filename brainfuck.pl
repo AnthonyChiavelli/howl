@@ -19,7 +19,6 @@ sub not_whitespace;
 #being perl #yolo
 my $TABLE_SIZE = 5000;
 
-
 #Array for command line args
 my %opts=();
 #Parse for flags and args
@@ -49,7 +48,7 @@ my %symbol_table = (
 my @table=((0) x $TABLE_SIZE);
 
 #Current pointer
-my $ptr;
+my $ptr = 0;
 
 #Holds symbols read in
 my $symbol;
@@ -75,7 +74,10 @@ sub not_whitespace {
   return 1;
 }
 
-sub output_val {
-  
-}
+sub output_val {print $table[$ptr]}
+sub inc_ptr{$ptr++}
+sub dec_ptr{$ptr--}
+sub inc_val{$table[$ptr]++}
+sub dev_val{$table[$ptr]--}
+
 
