@@ -44,6 +44,10 @@ my %symbol_table = (
   "]" => "cond_nz"
 );
 
+#Keep track of line and column for error reporting
+my $line = 1;
+my $col = 1;
+
 #Array of values, initialized to zero
 my @table=((0) x $TABLE_SIZE);
 
@@ -55,14 +59,23 @@ my $symbol;
 
 #Read byte by byte until EOF
 while (read INFILE, $symbol, 1) {
+
   #Call the function corresponding to the symbol
   if (exists($symbol_table{$symbol})) {
     #Treat the value string in the map as a function
     #name and call it
     &{$symbol_table{$symbol}}();
+    #Update column number
+    $col++;
+  }
+  #Update the line number
+  elsif ($symbol eq "\n") {
+    $line++;
+    $col = 1;
   }
   #Throw error and quit on invalid symbol
   elsif (not_whitespace($symbol)) {
+    print "Error: Invalid Symbol \"$symbol\" encountered at $line:$col\n";
     die $!;
   }
 }
