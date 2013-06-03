@@ -13,7 +13,7 @@ sub output_val;
 sub input_val;
 sub cond_z;
 sub cond_nz;
-sub is_whitespace;
+sub not_whitespace;
 
 #Array for command line args
 my %opts=();
@@ -52,8 +52,14 @@ while (read INFILE, $symbol, 1) {
     &{$symbol_table{$symbol}}();
   }
   #Throw error and quit on invalid symbol
-  elsif (!is_whitespace($symbol)) {
+  elsif (not_whitespace($symbol)) {
     die $!;
   }
 }
 
+sub not_whitespace {
+  if ($_[0] eq " " || $_[0] eq "\t" || $_[0] eq "\n") {
+    return 0;
+  }
+  return 1;
+}
