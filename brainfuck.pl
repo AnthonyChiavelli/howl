@@ -80,6 +80,7 @@ while (read INFILE, $symbol, 1) {
   }
 }
 
+#Returns true if the 1-char string passed is NOT whitespace
 sub not_whitespace {
   if ($_[0] eq " " || $_[0] eq "\t" || $_[0] eq "\n") {
     return 0;
@@ -87,30 +88,43 @@ sub not_whitespace {
   return 1;
 }
 
+#Get a byte from stdin, store it as ascii val at pointer
 sub input_val {
-    
+  print ">";
+  my $byte;
+  read(STDIN, $byte, 1);
+  $table[$ptr] = ord($byte);
 }
-sub output_val {print $table[$ptr]}
+
+#Print out value at pointer as ascii character
+sub output_val {
+  print chr($table[$ptr]);
+}
+
+#Move the pointer to the right
 sub inc_ptr{
   $ptr++;
   if ($ptr > $TABLE_SIZE) {
     print "\nError: Out of Bounds (pointer > table size limit) at $line:$col\n";
     die $!;
   }
-  
 }
+
+#Move the pointer to the left
 sub dec_ptr{
   $ptr--;
   if ($ptr < 0) {
     print "\nError: Out Of Bounds (pointer < 0) at $line:$col\n";
     die $!;
-  }
-  
+  } 
 }
+
+#Increment the value at the pointer
 sub inc_val{
   $table[$ptr]++;
 }
 
+#Decrement the value at the pointer
 sub dec_val{
   $table[$ptr]--;
 }
