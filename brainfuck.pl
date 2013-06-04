@@ -1,3 +1,5 @@
+#!/usr/bin/perl
+
 #use strict;
 use warnings;
 
@@ -48,8 +50,8 @@ my %symbol_table = (
 my $line = 1;
 my $col = 1;
 
-#Bracket housekeeping
-my $last_lbracket;
+#Bracket location stack
+@bracket_stack = ();
 
 #Array of values, initialized to zero
 my @table=((0) x $TABLE_SIZE);
@@ -101,7 +103,7 @@ sub input_val {
 
 #Print out value at pointer as ascii character
 sub output_val {
-  print $table[$ptr];
+  print chr($table[$ptr]);
 }
 
 #Move the pointer to the right
@@ -135,7 +137,8 @@ sub dec_val{
 #[ encountered
 sub cond_z {
   #Keep track of last [
-  $last_lbracket = tell(INFILE); 
+  push(@bracket_stack, tell(INFILE)-1); 
+  print "Pushing".(tell(INFILE)-1)."\n";
   #Perform conditional seek to corresponding
   #closing bracket
   if ($table[$ptr] == 0) {
@@ -147,13 +150,24 @@ sub cond_z {
         die $!;
       }
     }
+    pop(@bracket_stack);
   }
 }
 
 #] encountered
 sub cond_nz {
-  if ($table[%ptr] ne 0) {
-    seek(INFILE, $last_lbracket+1, 1);
+  #If the value at the ptr is nonzero, jump
+  #to after the matching [
+  $last_bracket = pop(@bracket_stack);
+  if (!(defined($last_bracket))) {
+    print "\nERROR\n";
   }
+  else {
+    print "popping: ".($last_bracket)."\n";
+  }
+  seek (INFILE, $last_bracket, 1);
+  #if ($table[$ptr] != 0) {
+  #  seek(INFILE, $last_bracket, 1);
+  #}
 }
 
