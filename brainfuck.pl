@@ -152,9 +152,8 @@ sub cond_z {
 
 #] encountered
 sub cond_nz {
-
-
-
-
+  if ($table[%ptr] ne 0) {
+    seek(INFILE, $last_lbracket+1, 1);
+  }
 }
 
