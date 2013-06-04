@@ -24,7 +24,7 @@ my $TABLE_SIZE = 5000;
 #Array for command line args
 my %opts=();
 #Parse for flags and args
-getopts("f:cs:", \%opts);
+getopts("f:c:s:", \%opts);
 
 #If a file name was given
 if ($opts{f}) {
@@ -80,6 +80,10 @@ my $symbol;
 
 #TODO: Fix STDIN situation. Copy into temp file?
 
+#If compiling, we also need source
+if ($opts{c}) {
+  $opts{s} = "a.c";
+}
 
 #If specified, write to C file
 if ($opts{s}) {
@@ -124,8 +128,9 @@ while (read INFILE, $symbol, 1) {
 
 }
 
-#Delete temp file before exit
-unlink "temp";
+#Compile c source file
+my $c_return =  `/usr/bin/gcc -o $opts{c} $opts{s}`;
+#TODO figure out how to return value
 
 #Returns true if the 1-char string passed is NOT whitespace
 sub not_whitespace {
