@@ -26,13 +26,12 @@ my %opts=();
 #Parse for flags and args
 getopts("f:", \%opts);
 
-
 #If a file name was given
 if ($opts{f}) {
   #Open, or on error, die and store error in $!
   open INFILE, $opts{f} or die $!;
 }
-#TODO: else, read from stdin
+#TODO: else, read from stdin into file, we still need stdin during execution
 
 #Create a hash mapping symbols to functions
 my %symbol_table = (
@@ -64,7 +63,6 @@ my $symbol;
 
 #Read byte by byte until EOF
 while (read INFILE, $symbol, 1) {
-  #print "Reading symbol ".$symbol."\n";
   #Call the function corresponding to the symbol
   if (exists($symbol_table{$symbol})) {
     #Treat the value string in the map as a function
@@ -103,8 +101,6 @@ sub input_val {
 
 #Print out value at pointer as ascii character
 sub output_val {
-  #print "here";
-  #print $table[$ptr];
   print chr($table[$ptr]);
 }
 
@@ -140,7 +136,6 @@ sub dec_val{
 sub cond_z {
   #Keep track of last [
   push(@bracket_stack, tell(INFILE)-1); 
-  #print "Pushing".(tell(INFILE)-1)."\n";
   #Perform conditional seek to corresponding
   #closing bracket
   if ($table[$ptr] == 0) {
@@ -161,15 +156,6 @@ sub cond_nz {
   #If the value at the ptr is nonzero, jump
   #to after the matching [
   $last_bracket = pop(@bracket_stack);
-  if (!(defined($last_bracket))) {
-    print "\nERROR\n";
-  }
-  else {
-    #print "popping: ".($last_bracket)."\n";
-  }
   seek (INFILE, $last_bracket, 0);
-  #if ($table[$ptr] != 0) {
-  #  seek(INFILE, $last_bracket, 1);
-  #}
 }
 
