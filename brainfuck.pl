@@ -24,7 +24,7 @@ my $TABLE_SIZE = 5000;
 #Array for command line args
 my %opts=();
 #Parse for flags and args
-getopts("f:", \%opts);
+getopts("f:cs:", \%opts);
 
 #If a file name was given
 if ($opts{f}) {
@@ -32,18 +32,10 @@ if ($opts{f}) {
   open INFILE, $opts{f} or die $!;
 }
 else {
-  #Delete old temp file if present
-  unlink("temp");
-  #Create new file to copy STDIN into  
-  open(INFILE, ">>temp") or die $!;
-  while (my $line = <STDIN>) {
-    #print $line;
-    print INFILE $line;
-  }
-  #Close file and open for reading
-  close(INFILE);
-  open(INFILE, "temp");
+  open(INFILE, "+>>".<>) or die $!;
 }
+
+
 
 #Create a hash mapping symbols to functions
 my %symbol_table = (
@@ -57,6 +49,19 @@ my %symbol_table = (
   "]" => "cond_nz"
 );
 
+
+
+#A hash mapping symbols to equivalent c code
+my %c_table = (
+  ">" => "ptr++;\n",
+  "<" => "ptr--;\n",
+  "+" => "(*ptr)++;\n",
+  "-" => "(*ptr)--;\n",
+  "." => "putchar(*ptr);\n",
+  "," => "*ptr = getchar();\n",
+  "[" => "while (*ptr) {\n",
+  "]" => "}\n"
+);
 #Keep track of line and column for error reporting
 my $line = 1;
 my $col = 1;
@@ -72,6 +77,29 @@ my $ptr = 0;
 
 #Holds symbols read in
 my $symbol;
+
+#TODO: Fix STDIN situation. Copy into temp file?
+
+
+#If specified, write to C file
+if ($opts{s}) {
+  #C Boiler plate
+  my $HEAD = "#include<stdio.h>\n
+              #include<stdlib.h>\n
+              main() {\n 
+              char *ptr = malloc($TABLE_SIZE);\n";
+  my $TAIL = "}";
+  #Open and write
+  open(CFILE, ">".$opts{s});
+  print CFILE $HEAD;
+  while (read INFILE, $symbol, 1) {
+    #Write out a line of C
+    if (exists($c_table{$symbol})) {
+      print CFILE $c_table{$symbol};
+    }
+  }
+  print CFILE $TAIL;
+}
 
 #Read byte by byte until EOF
 while (read INFILE, $symbol, 1) {
@@ -93,6 +121,7 @@ while (read INFILE, $symbol, 1) {
     print "Error: Invalid Symbol \"$symbol\" encountered at $line:$col\n";
     die $!;
   }
+
 }
 
 #Delete temp file before exit
@@ -106,13 +135,22 @@ sub not_whitespace {
   return 1;
 }
 
-#Get a byte from stdin, store it as ascii val at pointer
+#Get a value from stdin, store it at pointer
 sub input_val {
   print ">";
-  my $byte;
-  read(STDIN, $byte, 1);
-  $table[$ptr] = $byte;
-  #$table[$ptr] = ord($byte);
+  my $input = <STDIN>;
+  #Match number
+  if ($input =~ /(\d+)/) {
+    $table[$ptr] = $input;
+  }
+  #Match single-quoted char
+  elsif ($input =~ /'.*'/) {
+    $table[$ptr] = ord($input);
+  }
+  else {
+    print "Invalid input character. Please input a number or single-quoted ascii character";
+    input_val();
+  }
 }
 
 #Print out value at pointer as ascii character
