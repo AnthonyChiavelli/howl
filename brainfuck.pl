@@ -48,6 +48,9 @@ my %symbol_table = (
 my $line = 1;
 my $col = 1;
 
+#Bracket housekeeping
+my $last_lbracket;
+
 #Array of values, initialized to zero
 my @table=((0) x $TABLE_SIZE);
 
@@ -98,7 +101,7 @@ sub input_val {
 
 #Print out value at pointer as ascii character
 sub output_val {
-  print chr($table[$ptr]);
+  print $table[$ptr];
 }
 
 #Move the pointer to the right
@@ -129,4 +132,29 @@ sub dec_val{
   $table[$ptr]--;
 }
 
+#[ encountered
+sub cond_z {
+  #Keep track of last [
+  $last_lbracket = tell(INFILE); 
+  #Perform conditional seek to corresponding
+  #closing bracket
+  if ($table[$ptr] == 0) {
+    my $byte = "";
+    while ($byte ne "]") {
+      #Read chars in, dying if EOF is reached
+      if (read (INFILE, $byte, 1) == 0) {
+        print "\nERROR: No closing ] for [ at $line:$col\n";
+        die $!;
+      }
+    }
+  }
+}
+
+#] encountered
+sub cond_nz {
+
+
+
+
+}
 
