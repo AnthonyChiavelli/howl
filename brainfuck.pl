@@ -31,7 +31,19 @@ if ($opts{f}) {
   #Open, or on error, die and store error in $!
   open INFILE, $opts{f} or die $!;
 }
-#TODO: else, read from stdin into file, we still need stdin during execution
+else {
+  #Delete old temp file if present
+  unlink("temp");
+  #Create new file to copy STDIN into  
+  open(INFILE, ">>temp") or die $!;
+  while (my $line = <STDIN>) {
+    #print $line;
+    print INFILE $line;
+  }
+  #Close file and open for reading
+  close(INFILE);
+  open(INFILE, "temp");
+}
 
 #Create a hash mapping symbols to functions
 my %symbol_table = (
@@ -83,6 +95,9 @@ while (read INFILE, $symbol, 1) {
   }
 }
 
+#Delete temp file before exit
+unlink "temp";
+
 #Returns true if the 1-char string passed is NOT whitespace
 sub not_whitespace {
   if ($_[0] eq " " || $_[0] eq "\t" || $_[0] eq "\n") {
@@ -96,7 +111,8 @@ sub input_val {
   print ">";
   my $byte;
   read(STDIN, $byte, 1);
-  $table[$ptr] = ord($byte);
+  $table[$ptr] = $byte;
+  #$table[$ptr] = ord($byte);
 }
 
 #Print out value at pointer as ascii character
