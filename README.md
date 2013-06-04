@@ -7,9 +7,10 @@ NBI for nameless brainfuck interpreter. So far, NBI catches most errors and disp
 error message with line/column number and nature of error.
 
 **USAGE**
+* Specify bf file wiht -f flag
 * When no -f flag is present, NBI will read from STDIN (no inputting allowed as of yet)
-* When -c flag is present, NBI will convert the brainfuck into C then compile it
-* When -s flag is present, NBI will convert the brainfuck into C
+* When -c (filename) is present, NBI will convert the brainfuck into C then compile it
+* When -s (filename) is present, NBI will convert the brainfuck into C
 
 
 **COMING SOON**
