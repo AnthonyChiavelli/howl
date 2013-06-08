@@ -130,10 +130,10 @@ if ($c_file) {
 #Compile c source file
 if ($exec_file) {
   print "/usr/bin/gcc -o $exec_file $c_file\n";
-  my $c_return =  `/usr/bin/gcc -o $exec_file $c_file`;
+  `/usr/bin/gcc -o $exec_file $c_file`;
   unlink($c_file);
   #Exit with error code from gcc
-  exit($c_return);
+  exit($?);
 }
 
 #------Main loop for execution-------
