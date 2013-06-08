@@ -17,13 +17,16 @@ sub cond_z;
 sub cond_nz;
 sub not_whitespace;
 
-#Pseudo-constants because I'm still in C mode despite this
-#being perl #yolo
+#Because I'm still a C programmer at heart
 my $TABLE_SIZE = 5000;
 
 #Array for command line args
 my %opts=();
+
 #Parse for flags and args
+#'-f filename' specifies filename to read
+#'-c filename' compiles with gcc
+#'-s filename' outputs c source code
 getopts("f:c:s:", \%opts);
 
 #If a file name was given
@@ -32,7 +35,7 @@ if ($opts{f}) {
   open INFILE, $opts{f} or die "Error: Could not open file $!";
 }
 else {
-  #open(INFILE, <STDIN>) or die $!;
+  #Duplicate STDIN handle
   open(INFILE, "<&STDIN") or die "Error: Could not duplicate STDIN: $!";
 }
 
@@ -75,8 +78,6 @@ my $ptr = 0;
 #Holds symbols read in
 my $symbol;
 
-#TODO: Fix STDIN situation. Copy into temp file?
-
 #If compiling, we also need source
 if ($opts{c}) {
   $opts{s} = "a.c";
@@ -94,14 +95,24 @@ if ($opts{s}) {
   open(CFILE, ">".$opts{s});
   print CFILE $HEAD;
   while (read INFILE, $symbol, 1) {
+    #Track column and line for error reporting
+    $col++;
+    if ($symbol eq "\n") {
+      $col = 1;
+      $line++;
+    }
     #Write out a line of C
     if (exists($c_table{$symbol})) {
       print CFILE $c_table{$symbol};
+    } 
+    else {
+      die "Error: invalid symbol encountered at $line:$col: #!"
     }
   }
   print CFILE $TAIL;
 }
 
+#------Main loop for execution-------
 #Read byte by byte until EOF
 while (read INFILE, $symbol, 1) {
   #Call the function corresponding to the symbol
@@ -122,7 +133,6 @@ while (read INFILE, $symbol, 1) {
     print "Error: Invalid Symbol \"$symbol\" encountered at $line:$col\n";
     die $!;
   }
-
 }
 
 #Compile c source file
