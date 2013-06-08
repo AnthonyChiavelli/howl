@@ -45,11 +45,11 @@ if ($wants_help) {
 #If a file name was given
 if ($file) {
   #Open, or on error, die and store error in $!
-  open INFILE, $file or die "Error: Could not open file $file";
+  open INFILE, $file or die "\nError: Could not open file $file";
 }
 else {
   #Duplicate STDIN handle
-  open(INFILE, "<&STDIN") or die "Error: Could not duplicate STDIN: $!";
+  open(INFILE, "<&STDIN") or die "\nError: Could not duplicate STDIN: $!";
 }
 
 #If compiling, we also need source
@@ -120,7 +120,8 @@ if ($c_file) {
       print CFILE $c_table{$symbol};
     } 
     elsif (not_whitespace($symbol)) {
-      die "Error: invalid symbol '$symbol' encountered at $line:$col";
+      print "\nError: invalid symbol '$symbol' encountered at $line:$col\n";
+      exit(1);
     }
   }
   print CFILE $TAIL;
@@ -153,8 +154,8 @@ while (read INFILE, $symbol, 1) {
   }
   #Throw error and quit on invalid symbol
   elsif (not_whitespace($symbol)) {
-    print "Error: Invalid Symbol \"$symbol\" encountered at $line:$col\n";
-    die $!;
+    print "\nError: Invalid Symbol '$symbol' encountered at $line:$col\n";
+    exit(1);
   }
 }
 
@@ -201,7 +202,7 @@ sub inc_ptr{
   $ptr++;
   if ($ptr > $TABLE_SIZE) {
     print "\nError: Out of Bounds (pointer > table size limit) at $line:$col\n";
-    die $!;
+    exit(2);
   }
 }
 
@@ -210,7 +211,7 @@ sub dec_ptr{
   $ptr--;
   if ($ptr < 0) {
     print "\nError: Out Of Bounds (pointer < 0) at $line:$col\n";
-    die $!;
+    exit(2);
   } 
 }
 
@@ -235,8 +236,8 @@ sub cond_z {
     while ($byte ne "]") {
       #Read chars in, dying if EOF is reached
       if (read (INFILE, $byte, 1) == 0) {
-        print "\nERROR: No closing ] for [ at $line:$col\n";
-        die $!;
+        print "\nError: No closing ] for [ at $line:$col\n";
+        exit(3);
       }
     }
     pop(@bracket_stack);
