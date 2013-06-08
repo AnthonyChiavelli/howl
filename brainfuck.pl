@@ -35,8 +35,6 @@ else {
   open(INFILE, "+>>".<>) or die $!;
 }
 
-
-
 #Create a hash mapping symbols to functions
 my %symbol_table = (
   ">" => "inc_ptr",
@@ -48,8 +46,6 @@ my %symbol_table = (
   "[" => "cond_z",
   "]" => "cond_nz"
 );
-
-
 
 #A hash mapping symbols to equivalent c code
 my %c_table = (
