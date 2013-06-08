@@ -4,8 +4,9 @@ Howl
 Howl is a [brainfuck](http://esolangs.org/wiki/brainfuck) interpreter written in perl. It is capable
 of reading in BF source code and generating appropriate output. Invalid characters are reported along
 with line/column number. Input may be read from STDIN, and howl will still input characters from the
-user through STDIN as needed in the execution of the program. Howl may also translate BF source to C
-source code, and/or compile it with gcc. 
+user through STDIN as needed in the execution of the program. Input values may be integers representing
+ascii characters, or character literals, enclosed in single quotes. Output values are characters unless
+the -a flag is specified. Howl may also translate BF source to C source code, and/or compile it with gcc. 
 
 In the next release, debugging mode will be implemented. In this mode, execution will proceed up to
 user-set break points, or proceed symbol-wise, showing the state of the machine at all times. 
