@@ -12,13 +12,21 @@ user-set break points, or proceed symbol-wise, showing the state of the machine 
 
 
 **USAGE**
+
 Usage:
+
   -f | --file <file>    :    Execute file (else STDIN is used)
+  
   -h | --help           :    Display this message
+  
   -c | --compile        :    Compile code via gcc into executable
+  
   -s | --source <file>  :    Translate into C source code and output into file
+  
   -a | --ascii          :    Print ascii values instead of chars
+  
   -d | --debug          :    Not implemented yet
+  
 
 
 **COMING SOON**
