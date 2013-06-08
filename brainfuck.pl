@@ -125,9 +125,10 @@ while (read INFILE, $symbol, 1) {
 }
 
 #Compile c source file
-my $c_return =  `/usr/bin/gcc -o $opts{c} $opts{s}`;
-#TODO figure out how to return value
-
+if ($opts{"c"}) {
+  my $c_return =  `/usr/bin/gcc -o $opts{c} $opts{s}`;
+  #TODO figure out how to return value
+}
 #Returns true if the 1-char string passed is NOT whitespace
 sub not_whitespace {
   if ($_[0] eq " " || $_[0] eq "\t" || $_[0] eq "\n") {
@@ -139,17 +140,18 @@ sub not_whitespace {
 #Get a value from stdin, store it at pointer
 sub input_val {
   print ">";
+  my $char;
   my $input = <STDIN>;
   #Match number
   if ($input =~ /(\d+)/) {
     $table[$ptr] = $input;
   }
   #Match single-quoted char
-  elsif ($input =~ /'.*'/) {
-    $table[$ptr] = ord($input);
+  elsif ($input =~ /'.{1}'/) {
+    $table[$ptr] = ord(substr($input, 1));
   }
   else {
-    print "Invalid input character. Please input a number or single-quoted ascii character";
+    print "Invalid input character. Please input a number or single-quoted ascii character\n";
     input_val();
   }
 }
