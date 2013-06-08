@@ -7,7 +7,6 @@ use warnings;
 #use Getopt::Std;
 use Getopt::Long;
 
-
 #function declarations
 sub inc_ptr;
 sub dec_ptr;
@@ -251,4 +250,3 @@ sub cond_nz {
   $last_bracket = pop(@bracket_stack);
   seek (INFILE, $last_bracket, 0);
 }
-
