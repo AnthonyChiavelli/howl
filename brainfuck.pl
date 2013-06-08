@@ -29,10 +29,11 @@ getopts("f:c:s:", \%opts);
 #If a file name was given
 if ($opts{f}) {
   #Open, or on error, die and store error in $!
-  open INFILE, $opts{f} or die $!;
+  open INFILE, $opts{f} or die "Error: Could not open file $!";
 }
 else {
-  open(INFILE, "+>>".<>) or die $!;
+  #open(INFILE, <STDIN>) or die $!;
+  open(INFILE, "<&STDIN") or die "Error: Could not duplicate STDIN: $!";
 }
 
 #Create a hash mapping symbols to functions
@@ -127,8 +128,10 @@ while (read INFILE, $symbol, 1) {
 #Compile c source file
 if ($opts{"c"}) {
   my $c_return =  `/usr/bin/gcc -o $opts{c} $opts{s}`;
-  #TODO figure out how to return value
+  #Exit with error code from gcc
+  exit($c_return);
 }
+
 #Returns true if the 1-char string passed is NOT whitespace
 sub not_whitespace {
   if ($_[0] eq " " || $_[0] eq "\t" || $_[0] eq "\n") {
