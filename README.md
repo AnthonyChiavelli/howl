@@ -16,7 +16,6 @@ user-set break points, or proceed symbol-wise, showing the state of the machine 
 Usage:
 
   -f | --file <file>    :    Execute file (else STDIN is used)
-  
   -h | --help           :    Display this message
   
   -c | --compile        :    Compile code via gcc into executable
