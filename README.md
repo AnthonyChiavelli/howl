@@ -1,16 +1,24 @@
-Brainfuck Interpreter
+Howl
 =========
 
-A yet-unnamed perl script that interprets brainfuck source code. Specify the -f flag on the 
-command line followed by the source code file to interpret. I will henceforth refer to it as
-NBI for nameless brainfuck interpreter. So far, NBI catches most errors and displays a helpful
-error message with line/column number and nature of error.
+Howl is a [brainfuck](http://esolangs.org/wiki/brainfuck) interpreter written in perl. It is capable
+of reading in BF source code and generating appropriate output. Invalid characters are reported along
+with line/column number. Input may be read from STDIN, and howl will still input characters from the
+user through STDIN as needed in the execution of the program. Howl may also translate BF source to C
+source code, and/or compile it with gcc. 
+
+In the next release, debugging mode will be implemented. In this mode, execution will proceed up to
+user-set break points, or proceed symbol-wise, showing the state of the machine at all times. 
+
 
 **USAGE**
-* Specify bf file wiht -f flag
-* When no -f flag is present, NBI will read from STDIN (no inputting allowed as of yet)
-* When -c (filename) is present, NBI will convert the brainfuck into C then compile it
-* When -s (filename) is present, NBI will convert the brainfuck into C
+Usage:
+  -f | --file <file>    :    Execute file (else STDIN is used)
+  -h | --help           :    Display this message
+  -c | --compile        :    Compile code via gcc into executable
+  -s | --source <file>  :    Translate into C source code and output into file
+  -a | --ascii          :    Print ascii values instead of chars
+  -d | --debug          :    Not implemented yet
 
 
 **COMING SOON**
