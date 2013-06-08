@@ -4,7 +4,9 @@
 use warnings;
 
 #Command line arg parser
-use Getopt::Std;
+#use Getopt::Std;
+use Getopt::Long;
+
 
 #function declarations
 sub inc_ptr;
@@ -24,19 +26,36 @@ my $TABLE_SIZE = 5000;
 my %opts=();
 
 #Parse for flags and args
-#'-f filename' specifies filename to read
-#'-c filename' compiles with gcc
-#'-s filename' outputs c source code
-getopts("f:c:s:", \%opts);
+GetOptions('f|file=s' => \$file,
+           'c|compile=s' => \$exec_file,
+           's|source=s' => \$c_file,
+           'h|help|usage' => \$wants_help,
+           'a|ascii' => \$ascii_mode);
+
+if ($wants_help) {
+  print "\nUsage:\n";
+  print "  -f | --file <file>    :    Execute file (else STDIN is used)\n";
+  print "  -h | --help           :    Display this message\n"; 
+  print "  -c | --compile        :    Compile code via gcc into executable\n";
+  print "  -s | --source <file>  :    Translate into C source code and output into file\n";
+  print "  -a | --ascii          :    Print ascii values instead of chars\n";
+  print "  -d | --debug          :    Not implemented yet\n";
+  exit(0);
+}
 
 #If a file name was given
-if ($opts{f}) {
+if ($file) {
   #Open, or on error, die and store error in $!
-  open INFILE, $opts{f} or die "Error: Could not open file $!";
+  open INFILE, $file or die "Error: Could not open file $file";
 }
 else {
   #Duplicate STDIN handle
   open(INFILE, "<&STDIN") or die "Error: Could not duplicate STDIN: $!";
+}
+
+#If compiling, we also need source
+if ($exec_file) {
+  $c_file= "a.c";
 }
 
 #Create a hash mapping symbols to functions
@@ -62,6 +81,7 @@ my %c_table = (
   "[" => "while (*ptr) {\n",
   "]" => "}\n"
 );
+
 #Keep track of line and column for error reporting
 my $line = 1;
 my $col = 1;
@@ -78,13 +98,8 @@ my $ptr = 0;
 #Holds symbols read in
 my $symbol;
 
-#If compiling, we also need source
-if ($opts{c}) {
-  $opts{s} = "a.c";
-}
-
 #If specified, write to C file
-if ($opts{s}) {
+if ($c_file) {
   #C Boiler plate
   my $HEAD = "#include<stdio.h>\n
               #include<stdlib.h>\n
@@ -92,7 +107,7 @@ if ($opts{s}) {
               char *ptr = malloc($TABLE_SIZE);\n";
   my $TAIL = "}";
   #Open and write
-  open(CFILE, ">".$opts{s});
+  open(CFILE, ">".$c_file);
   print CFILE $HEAD;
   while (read INFILE, $symbol, 1) {
     #Track column and line for error reporting
@@ -105,11 +120,20 @@ if ($opts{s}) {
     if (exists($c_table{$symbol})) {
       print CFILE $c_table{$symbol};
     } 
-    else {
-      die "Error: invalid symbol encountered at $line:$col: #!"
+    elsif (not_whitespace($symbol)) {
+      die "Error: invalid symbol '$symbol' encountered at $line:$col";
     }
   }
   print CFILE $TAIL;
+}
+
+#Compile c source file
+if ($exec_file) {
+  print "/usr/bin/gcc -o $exec_file $c_file\n";
+  my $c_return =  `/usr/bin/gcc -o $exec_file $c_file`;
+  unlink($c_file);
+  #Exit with error code from gcc
+  exit($c_return);
 }
 
 #------Main loop for execution-------
@@ -133,13 +157,6 @@ while (read INFILE, $symbol, 1) {
     print "Error: Invalid Symbol \"$symbol\" encountered at $line:$col\n";
     die $!;
   }
-}
-
-#Compile c source file
-if ($opts{"c"}) {
-  my $c_return =  `/usr/bin/gcc -o $opts{c} $opts{s}`;
-  #Exit with error code from gcc
-  exit($c_return);
 }
 
 #Returns true if the 1-char string passed is NOT whitespace
@@ -171,8 +188,14 @@ sub input_val {
 
 #Print out value at pointer as ascii character
 sub output_val {
-  print chr($table[$ptr]);
+  if ($ascii_mode) {
+    print $table[$ptr];
+  }
+  else {
+    print chr($table[$ptr]);
+  }
 }
+
 
 #Move the pointer to the right
 sub inc_ptr{
